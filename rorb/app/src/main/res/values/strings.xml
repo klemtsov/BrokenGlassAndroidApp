@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Разбитые окна, разбитый бизнес</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="task_activity_service_label">Сервис</string>
+    <string name="task_activity_info_label">Информация</string>
+    <string name="task_activity_address_label">Адрес</string>
+
+    <string name="add_photo_from_cam">Фото с камеры</string>
+    <string name="add_photo_from_gal">Фото из галереи</string>
+
+    <string name="save_task">Сохранить</string>
+    <string name="send_task">Отправить</string>
+    <string name="close_image_btn">Закрыть</string>
+    <string name="wait_loading_ens">Дождитесь завершения загрузки...</string>
+    <string name="del_claime_question">Удалить заявку?</string>
+    <string name="confirm_title">Подтвердите</string>
+    <string name="claime_saved_local">Заявка сохранена локально!</string>
+    <string name="wait_sending_message">Дождитесь завершения отправки</string>
+    <string name="task_activity_photo_cnt_label">Кол-во фото: 0</string>
+    <string name="photo_cnt_label">"Кол-во фото: "</string>
+    <string name="del_photo_question">Удалить фото?</string>
+    <string name="screen_one">Screen one</string>
+    <string name="page">page</string>
+    <string name="claime_status_all_name">Все</string>
+    <string name="claime_status_all_code">ALL</string>
+</resources>

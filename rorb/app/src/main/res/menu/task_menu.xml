@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/task_activity_menu_group_edit">
+        <item
+            android:id="@+id/add_photo_from_cam"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/add_photo_from_cam"
+            app:showAsAction="ifRoom|withText"/>
+        <item
+            android:id="@+id/add_photo_from_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/add_photo_from_gal"
+            app:showAsAction="ifRoom|withText"/>
+
+        <item
+            android:id="@+id/save_task"
+            android:title="@string/save_task"
+            app:showAsAction="ifRoom|withText"/>
+
+        <item
+            android:id="@+id/send_task"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/send_task"
+            app:showAsAction="ifRoom|withText"/>
+    </group>
+</menu>
