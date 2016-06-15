@@ -45,20 +45,20 @@ public class DBHelper extends SQLiteOpenHelper {
         long id = db.insert(SEQUENCE_TBL, null, val);
 
         //Создаем таблицу дат последних обновлений справочников
-        db.execSQL("create table last_rf_updates ("
-                + " table_name text,"
+        db.execSQL("create table " + LAST_UPDATE_TBL
+                + " (table_name text,"
                 + " last_update datetime);");
 
         // создаем таблицу статусов
-        db.execSQL("create table status ("
-                + " _id integer primary key,"
-                + "name text,"
+        db.execSQL("create table " + STATUS_TBL
+                + " (_id integer primary key,"
+                + " name text,"
                 + " code text,"
                 + " update_at datetime,"
                 + " update_by text);");
         //создам таблицу адресов
-        db.execSQL("create table address ("
-                + "_id integer primary key,"
+        db.execSQL("create table " + ADDRESS_TBL
+                + " (_id integer primary key,"
                 + " osb_code text,"
                 + " osb_name text,"
                 + " city text,"
@@ -70,8 +70,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         //создаем таблицу сервисов
-        db.execSQL("create table service ("
-                + " _id integer primary key,"
+        db.execSQL("create table " + SERVICE_TBL
+                + " (_id integer primary key,"
                 + "code text,"
                 + " name text,"
                 + " sort_order int,"
@@ -79,8 +79,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " update_by text);");
 
         //создаем таблицу обращений
-        db.execSQL("create table claime ("
-                + " _id real,"
+        db.execSQL("create table " + CLAIME_TBL
+                + " (_id real,"
                 + " service_id text,"
                 + " address_id int,"
                 + " status_id int,"
@@ -92,8 +92,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " has_photos integer);");
 
         //создаем таблицу фотографий
-        db.execSQL("create table photo ("
-                + " _id integer primary key autoincrement,"
+        db.execSQL("create table " + PHOTO_TBL
+                + " (_id integer primary key autoincrement,"
                 + " claime_id text,"
                 + " photo blob,"
                 + " thumbnail blob);");
@@ -101,7 +101,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-      /*  db.execSQL("drop table status");
+      /*db.execSQL("drop table status");
         db.execSQL("drop table address");
         db.execSQL("drop table service");
         db.execSQL("drop table claime");
@@ -214,7 +214,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 p.setClaimeId(Long.toString(rowId));
                 insertPhotoToDb(p, false);
             }
-
             return rowId;
         } finally {
             if (closeDb)

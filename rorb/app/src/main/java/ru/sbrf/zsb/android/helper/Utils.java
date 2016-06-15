@@ -65,17 +65,17 @@ public class Utils {
         return ConvertToDateWithFormat(dateString, SQLITE_DATE_FORMAT);
     }
 
-    public static String getStringFromDateTime(Date date, String format) {
-        if (date == null)
-            return null;
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.getDefault());
-        return dateFormat.format(date);
-    }
-
     public static String getStringFromDateTime(Date date) {
         if (date == null)
             return null;
         SimpleDateFormat dateFormat = new SimpleDateFormat(DB_DATE_FORMAT, Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
+    public static String getStringFromDateTime(Date date, String format) {
+        if (date == null)
+            return null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.getDefault());
         return dateFormat.format(date);
     }
 
