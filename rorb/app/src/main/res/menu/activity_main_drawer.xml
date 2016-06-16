@@ -5,12 +5,20 @@
         <item android:title="Настройки">
             <menu>
                 <item
+                    android:id="@+id/registration_link"
+                    android:icon="@drawable/ic_registration"
+                    android:title="Регистрация" />
+                <item
+                    android:id="@+id/login_link"
+                    android:icon="@drawable/ic_login"
+                    android:title="Войти" />
+                <item
                     android:id="@+id/my_profile"
-                    android:icon="@drawable/ic_menu_gallery"
+                    android:icon="@drawable/ic_profile"
                     android:title="Мой профиль" />
                 <item
                     android:id="@+id/prog_settings"
-                    android:icon="@drawable/ic_menu_manage"
+                    android:icon="@drawable/ic_settings"
                     android:title="Настройки программы" />
             </menu>
         </item>

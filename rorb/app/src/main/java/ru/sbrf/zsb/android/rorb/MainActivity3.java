@@ -1,8 +1,10 @@
 package ru.sbrf.zsb.android.rorb;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
@@ -17,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,29 +29,36 @@ import android.widget.Toast;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.HashMap;
 
-import ru.sbrf.zsb.android.helper.ClaimeConstant;
+import ru.sbrf.zsb.android.fragments.MainFragment;
 import ru.sbrf.zsb.android.netload.NetFetcher;
 
-public class MainActivity2 extends AppCompatActivity
+public class MainActivity3 extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String USER_TOKEN = "UserLogin";
     private static final int SHOW_PROGRESS = 1;
     private static final int STOP_PROGRESS = 2;
     private static final int NETWORK_FAILURE = 3;
+    private static final String SETTING_FILE = "settings";
+    private static final String SELECTED_GROUP = "selected_group";
 
     private ClaimeList mClaimeList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView mListView;
     private SwipeListAdapter adapter;
-    public static final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity3";
     private MyHandler mHandler;
 
     // initially offset will be 0, later will be updated while parsing the json
     private int offSet = 0;
     private ProgressBar mPropgress;
     private boolean mLoading;
+    private CharSequence mTitle;
+    private NavigationView mNavView;
+    private HashMap<MenuItem, Integer> myDrawerMenuItemMap;
+    private SharedPreferences mProgPrefs;
 
     public boolean isLoading() {
         return mLoading;
@@ -65,44 +75,56 @@ public class MainActivity2 extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isLoading()) {
-                    Toast.makeText(MainActivity2.this, getString(R.string.wait_loading_ens), Toast.LENGTH_SHORT).show();
+              /*  if (isLoading()) {
+                    Toast.makeText(MainActivity3.this, getString(R.string.wait_loading_ens), Toast.LENGTH_SHORT).show();
                 } else {
                     if (existsAllRefs()) {
-                        Intent i = new Intent(MainActivity2.this,
+                        Intent i = new Intent(MainActivity3.this,
                                 TaskActivity.class);
                         i.putExtra(TaskActivity.EXTRA_TASK_ID, ClaimeConstant.NEW_CLAIME_ID);
                         startActivity(i);
                     }
                     else
                     {
-                        Toast.makeText(MainActivity2.this, "Отсуствуют справочники, потяните экран вниз для обновления!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity3.this, "Отсуствуют справочники, потяните экран вниз для обновления!", Toast.LENGTH_LONG).show();
                     }
                 }
+                */
             }
+
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
+        mNavView = (NavigationView) findViewById(R.id.nav_view);
+        final Menu menu = mNavView.getMenu();
+        SubMenu claimeGroup = menu.addSubMenu("Обращения");
+        ClaimeStatusList claimeStatusList = ClaimeStatusList.get(this);
+        myDrawerMenuItemMap = new HashMap<>();
+        for (int i = 0; i < claimeStatusList.size(); i++) {
+            ClaimeStatus claimeStatus = claimeStatusList.get(i);
+            MenuItem menuItem = claimeGroup.add(claimeStatus.getName());
+            setMenuItemTag(menuItem, claimeStatus.getId());
+        }
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mPropgress = (ProgressBar) findViewById(R.id.main_activity_progressBar);
-        mHandler = new MyHandler();
+        //mPropgress = (ProgressBar) findViewById(R.id.main_activity_progressBar);
+        //mHandler = new MyHandler();
 
         //AddressList addressList = AddressList.get(this);
         //ServiceList serviceList = ServiceList.get(this);
         //ClaimeStatusList claimeStatusList = ClaimeStatusList.get(this);
 
-        mClaimeList = ClaimeList.get(this);
-        reloadTasksFromLocal();
+        //mClaimeList = ClaimeList.get(this);
+        //reloadTasksFromLocal();
 
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        mListView = (ListView) findViewById(android.R.id.list);
+       // swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        /*mListView = (ListView) findViewById(android.R.id.list);
 
         setupAdapter();
 
@@ -110,7 +132,7 @@ public class MainActivity2 extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Claime task = (Claime) parent.getAdapter().getItem(position);
-                Intent i = new Intent(MainActivity2.this,
+                Intent i = new Intent(MainActivity3.this,
                         TaskActivity.class);
                 i.putExtra(TaskActivity.EXTRA_TASK_ID, task.getId());
                 startActivity(i);
@@ -118,19 +140,45 @@ public class MainActivity2 extends AppCompatActivity
         });
 
         mListView.setOnItemLongClickListener(new ListViewOnItemLongClickListener());
-        swipeRefreshLayout.setOnRefreshListener(this);
+        */
+        //swipeRefreshLayout.setOnRefreshListener(this);
 
         /**
          * Showing Swipe Refresh animation on activity create
          * As animation won't start on onCreate, post runnable is used
          */
-        swipeRefreshLayout.post(new Runnable() {
+        /*swipeRefreshLayout.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        reloadTasksFromLocal();
+                                        //reloadTasksFromLocal();
                                     }
                                 }
         );
+        */
+
+        //if (savedInstanceState == null) {
+            mProgPrefs = getSharedPreferences(SETTING_FILE, Context.MODE_PRIVATE);
+            int selectedGroupId = mProgPrefs.getInt(SELECTED_GROUP, 0);
+            ClaimeStatus claimeStatus = ClaimeStatusList.get(this).getStateByID(selectedGroupId);
+            if (claimeStatus != null) {
+                selectStatusMenuItem(selectedGroupId);
+            }
+            else
+            {
+                selectStatusMenuItem(ClaimeStatusList.STATUS_ALL_ID);
+            }
+        //}
+    }
+
+    public void setMenuItemTag(MenuItem item, Integer tag)
+    {
+        myDrawerMenuItemMap.put(item, tag);
+    }
+
+    // returns null if tag has not been set(or was set to null)
+    public Integer getMenuItemTag(MenuItem item)
+    {
+        return myDrawerMenuItemMap.get(item);
     }
 
     //Проверка наличия значений в справочниках
@@ -148,7 +196,7 @@ public class MainActivity2 extends AppCompatActivity
             mClaime = (Claime) parent.getAdapter().getItem(position);
             if (isLoading() || mClaime == null || !ClaimeStatusList.isNew(mClaime.getStatus()))
                 return false;
-            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity2.this);
+            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity3.this);
             alert.setTitle(R.string.confirm_title);
             alert.setMessage(R.string.del_claime_question);
 
@@ -157,8 +205,8 @@ public class MainActivity2 extends AppCompatActivity
                 public void onClick(DialogInterface dialog, int which) {
                     //Удаляем несохраненную заявку
                     if (mClaime != null) {
-                        ClaimeList.get(MainActivity2.this).deleteClaime(mClaime);
-                        if (MainActivity2.this.adapter != null)
+                        ClaimeList.get(MainActivity3.this).deleteClaime(mClaime);
+                        if (MainActivity3.this.adapter != null)
                         {
                             adapter.notifyDataSetChanged();
                         }
@@ -188,7 +236,7 @@ public class MainActivity2 extends AppCompatActivity
 
     //Настройка адаптера
     private void setupAdapter() {
-        ClaimeList list = ClaimeList.get(MainActivity2.this);
+        ClaimeList list = ClaimeList.get(MainActivity3.this);
         adapter = new SwipeListAdapter(this, list.getItems());
         mListView.setAdapter(adapter);
     }
@@ -250,25 +298,76 @@ public class MainActivity2 extends AppCompatActivity
         }
     }
 
+    public void selectStatusMenuItem(int statusId)
+    {
+        Fragment fragment = MainFragment.createInstance(statusId);
+        if (fragment != null) {
+            android.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment).commit();
+
+            mProgPrefs.edit().putInt(SELECTED_GROUP, statusId);
+
+            // Highlight the selected item, update the title, and close the drawer
+            //item.setItemChecked(position, true);
+            //setTitle(mScreenTitles[position]);
+            //mDrawerLayout.closeDrawer(mDrawerList);
+        } else {
+            // Error
+            Log.e(this.getClass().getName(), "Error. Fragment is not created");
+        }
+    }
+
+
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
-        if (id == R.id.my_profile) {
+        Integer tag = getMenuItemTag(item);
+        if (tag != null)
+        {
+            selectStatusMenuItem(tag);
+
+        }
+
+
+
+        switch (id)
+        {
+
+           // case R.id.nav_all:
+           //     fragment = new MainFragment();
+           //     break;
+           // case R.id.nav_new:
+           //     fragment = new MainFragment();
+        }
+
+      /*  if (id == R.id.my_profile) {
             // Окно настроек профиля
-        } else if (id == R.id.prog_settings) {
+        } else
+        if (id == R.id.prog_settings) {
             // Окно настроек программы
         }
+    */
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-private class FetchTasks extends AsyncTask<Boolean, Void, Void> {
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        super.setTitle(title);
+    }
+
+    private class FetchTasks extends AsyncTask<Boolean, Void, Void> {
     private String error;
 
     @Override
@@ -280,31 +379,31 @@ private class FetchTasks extends AsyncTask<Boolean, Void, Void> {
 
     @Override
     protected Void doInBackground(Boolean... params) {
-        ClaimeList claimeList = ClaimeList.get(MainActivity2.this);
+        ClaimeList claimeList = ClaimeList.get(MainActivity3.this);
         try {
             if (!params[0]) {
                 //Загрузка из локальной БД
-                DBHelper db = new DBHelper(MainActivity2.this);
+                DBHelper db = new DBHelper(MainActivity3.this);
                 claimeList.setItems(db.getClameListFromDb());
             } else {
                 //Загрузка с сервера
-                NetFetcher nf = new NetFetcher(MainActivity2.this);
+                NetFetcher nf = new NetFetcher(MainActivity3.this);
                 ClaimeStatusList cslist = nf.fetchStatuses();
                 cslist.saveToDb();
                 cslist.loadFromDb();
-                //ClaimeStatusList.set(nf.fetchStatuses(), MainActivity.this);
+                //ClaimeStatusList.set(nf.fetchStatuses(), MainActivity3.this);
                 AddressList addressList = nf.fetchAddresses();
                 addressList.saveToDb();
                 addressList.loadFromDb();
-                //AddressList.set(nf.fetchAddresses(), MainActivity.this);
+                //AddressList.set(nf.fetchAddresses(), MainActivity3.this);
                 ServiceList serviceList = nf.fetchServices();
                 serviceList.saveToDb();
                 serviceList.loadFromDb();
-                //ServiceList.set(nf.fetchServices(), MainActivity.this);
+                //ServiceList.set(nf.fetchServices(), MainActivity3.this);
 
                 claimeList.setItems(nf.fetchClaims());
                 claimeList.saveToDb();
-                DBHelper db = new DBHelper(MainActivity2.this);
+                DBHelper db = new DBHelper(MainActivity3.this);
                 claimeList.setItems(db.getClameListFromDb());
 
 
@@ -325,7 +424,7 @@ private class FetchTasks extends AsyncTask<Boolean, Void, Void> {
         super.onPostExecute(aVoid);
         try {
             if (error != null) {
-                Toast.makeText(MainActivity2.this, error, Toast.LENGTH_LONG);
+                Toast.makeText(MainActivity3.this, error, Toast.LENGTH_LONG);
             }
 
             setupAdapter();
@@ -353,7 +452,7 @@ private class MyHandler extends android.os.Handler {
                 break;
 
             case NETWORK_FAILURE:
-                Toast.makeText(MainActivity2.this, "Ошибка соединения!", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity3.this, "Ошибка соединения!", Toast.LENGTH_LONG).show();
                 mHandler.removeMessages(NETWORK_FAILURE);
                 break;
         }

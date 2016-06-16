@@ -7,9 +7,6 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import ru.sbrf.zsb.android.netload.NetFetcher;
 
 /**
@@ -123,7 +120,7 @@ public class ClaimeStatusList extends RefObjectList<ClaimeStatus> {
                 Toast.makeText(mContext, error, Toast.LENGTH_LONG);
             } else {
                 Toast.makeText(mContext, "Загрузка статусов завершена!", Toast.LENGTH_LONG);
-                Log.d(MainActivity.TAG, "Загрузка статусов завершена!");
+                Log.d(MainActivity3.TAG, "Загрузка статусов завершена!");
             }
         }
     }

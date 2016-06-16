@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * Created by Oleg on 08.05.2016.
@@ -35,9 +34,9 @@ public class ClaimeList {
     public void saveToDb()
     {
         DBHelper db = new DBHelper(mContext);
-        Log.d(MainActivity.TAG, "Загрузка заявок в БД");
+        Log.d(MainActivity3.TAG, "Загрузка заявок в БД");
         db.saveClaimeListToDb(getItems());
-        Log.d(MainActivity.TAG, "Загрузка заявок в БД завершена");
+        Log.d(MainActivity3.TAG, "Загрузка заявок в БД завершена");
     }
 
     public void deleteClaime(Claime claime)

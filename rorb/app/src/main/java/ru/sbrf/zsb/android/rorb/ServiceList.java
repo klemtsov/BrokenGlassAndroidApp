@@ -24,7 +24,7 @@ public class ServiceList extends  RefObjectList<Service> {
         if (sServiceList == null)
         {
             DBHelper db = new DBHelper(c);
-            Log.d(MainActivity.TAG, "Запуск загрузки списка сервисов из бд");
+            Log.d(MainActivity3.TAG, "Запуск загрузки списка сервисов из бд");
             sServiceList = db.getServiceListFromDb();
             //sServiceList.reload();
         }
@@ -106,7 +106,7 @@ public class ServiceList extends  RefObjectList<Service> {
             }
             else {
                 Toast.makeText(mContext, "Загрузка статусов завершена!", Toast.LENGTH_LONG);
-                Log.d(MainActivity.TAG, "Загрузка сервисов завершена!");
+                Log.d(MainActivity3.TAG, "Загрузка сервисов завершена!");
             }
         }
     }

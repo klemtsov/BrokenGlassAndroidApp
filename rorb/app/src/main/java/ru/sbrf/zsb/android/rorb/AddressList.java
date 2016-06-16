@@ -18,7 +18,7 @@ public class AddressList extends RefObjectList<Address> {
     public static AddressList get(Context c){
         if (sAddressList == null){
             DBHelper db = new DBHelper(c);
-            Log.d(MainActivity.TAG, "Запуск загрузки списка адресов из локальной бд");
+            Log.d(MainActivity3.TAG, "Запуск загрузки списка адресов из локальной бд");
             sAddressList = db.getAddressListFromDb();
         }
         return sAddressList;
@@ -87,7 +87,7 @@ public class AddressList extends RefObjectList<Address> {
             }
             else {
                 Toast.makeText(mContext, "Загрузка адресов завершена", Toast.LENGTH_LONG);
-                Log.d(MainActivity.TAG, "Загрузка адресов завершена");
+                Log.d(MainActivity3.TAG, "Загрузка адресов завершена");
             }
 
 

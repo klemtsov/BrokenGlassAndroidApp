@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Environment;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -20,9 +19,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-
-import ru.sbrf.zsb.android.rorb.MainActivity;
 
 /**
  * Created by Администратор on 27.05.2016.

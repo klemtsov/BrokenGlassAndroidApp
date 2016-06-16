@@ -14,7 +14,7 @@ import ru.sbrf.zsb.android.helper.Utils;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 3;
     private static final String DB_NAME = "brglass_db";
     private static final String CLAIME_TBL = "claime";
     public static final String ADDRESS_TBL = "address";
@@ -25,6 +25,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String LAST_UPDATE_TBL = "last_rf_updates";
     private static final String SEQUENCE_TBL_CODE_COL = "code";
     private static final String SEQUENCE_TBL_CLAIME_ID = "CLAIME_ID";
+    private static final String USER_TBL = "user";
     private final Context mContext;
     protected SQLiteDatabase mDb;
 
@@ -35,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        Log.d(MainActivity.TAG, " --- onCreate database --- ");
+        Log.d(MainActivity3.TAG, " --- onCreate database --- ");
         //ContentValues cv = new ContentValues();
 
         db.execSQL("create table " + SEQUENCE_TBL + " (_id integer, code text);");
@@ -97,6 +98,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " claime_id text,"
                 + " photo blob,"
                 + " thumbnail blob);");
+
+        db.execSQL("create table " + USER_TBL
+                + " (_id integer primary key autoincrement,"
+                + " email text NOT NULL,"
+                + " first_name text,"
+                + " last_name text,"
+                + " token text,"
+                + " expire_token datetime,"
+                + " last_login datetime,"
+                + " avatar_img blob,"
+                + " CONSTRAINT cnstr_user_email UNIQUE (email)"
+                + ");"
+        );
 
     }
 
@@ -288,7 +302,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void UpdateAllStatuses(ClaimeStatusList statuses) {
-        Log.d(MainActivity.TAG, "Сохранение статусов в локальную БД");
+        Log.d(MainActivity3.TAG, "Сохранение статусов в локальную БД");
         openDB();
         Date maxUpdateAt = null;
         mDb.beginTransaction();
@@ -301,11 +315,11 @@ public class DBHelper extends SQLiteOpenHelper {
             saveMaxUpdateAt(STATUS_TBL, maxUpdateAt);
             mDb.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(MainActivity.TAG, "Сохранение статусов в локальную БД, ошибка: " + e.getMessage());
+            Log.d(MainActivity3.TAG, "Сохранение статусов в локальную БД, ошибка: " + e.getMessage());
         } finally {
             mDb.endTransaction();
             mDb.close();
-            Log.d(MainActivity.TAG, "Сохранение статусов в локальную БД завершено");
+            Log.d(MainActivity3.TAG, "Сохранение статусов в локальную БД завершено");
         }
     }
 
@@ -420,7 +434,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void UpdateAllServices(ServiceList services) {
-        Log.d(MainActivity.TAG, "Сохранение сервисов в локальную БД");
+        Log.d(MainActivity3.TAG, "Сохранение сервисов в локальную БД");
         openDB();
         Date maxUpdateAt = null;
         mDb.beginTransaction();
@@ -433,12 +447,12 @@ public class DBHelper extends SQLiteOpenHelper {
             saveMaxUpdateAt(SERVICE_TBL, maxUpdateAt);
             mDb.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(MainActivity.TAG, "Сохранение сервисов в локальную БД, ошибка: " + e.getMessage());
+            Log.d(MainActivity3.TAG, "Сохранение сервисов в локальную БД, ошибка: " + e.getMessage());
 
         } finally {
             mDb.endTransaction();
             mDb.close();
-            Log.d(MainActivity.TAG, "Сохранение сервисов в локальную БД завершено");
+            Log.d(MainActivity3.TAG, "Сохранение сервисов в локальную БД завершено");
         }
     }
 
@@ -518,7 +532,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     for (int i = 0; i < c.getColumnCount(); i++) {
                         str = str + c.getColumnName(i) + " = " + c.getString(i) + ";";
                     }
-                    Log.d(MainActivity.TAG, str);
+                    Log.d(MainActivity3.TAG, str);
                 } while ((c.moveToNext()));
             c.close();
         }
@@ -526,19 +540,19 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public long insertPhotoToDb(Photo photo, boolean closeDb) {
         openDB();
-        Log.d(MainActivity.TAG, "До вставки");
+        Log.d(MainActivity3.TAG, "До вставки");
         showPhotoTable();
-        Log.d(MainActivity.TAG, "Вставляем");
+        Log.d(MainActivity3.TAG, "Вставляем");
         try {
             ContentValues val = new ContentValues();
-            Log.d(MainActivity.TAG, "id =" + photo.getId());
-            Log.d(MainActivity.TAG, "claime_id =" + photo.getClaimeId());
+            Log.d(MainActivity3.TAG, "id =" + photo.getId());
+            Log.d(MainActivity3.TAG, "claime_id =" + photo.getClaimeId());
             val.put("_id", photo.getId());
             val.put("claime_id", photo.getClaimeId());
             val.put("photo", photo.getFile());
             val.put("thumbnail", photo.getThumbnail());
             int id = (int) mDb.insert(PHOTO_TBL, null, val);
-            Log.d(MainActivity.TAG, "После вставки " + id);
+            Log.d(MainActivity3.TAG, "После вставки " + id);
             showPhotoTable();
             photo.setId(id);
             return id;
@@ -605,7 +619,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //обнавление всего списка адресов
     public void UpdateAllAddresses(AddressList addresses) {
-        Log.d(MainActivity.TAG, "Сохранение адресов в локальную БД");
+        Log.d(MainActivity3.TAG, "Сохранение адресов в локальную БД");
         openDB();
         Date maxUpdateAt = null;
         mDb.beginTransaction();
@@ -622,13 +636,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
             mDb.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(MainActivity.TAG, "Сохранение адресов в локальную БД, ошибка: " + e.getMessage());
+            Log.d(MainActivity3.TAG, "Сохранение адресов в локальную БД, ошибка: " + e.getMessage());
 
         } finally {
 
             mDb.endTransaction();
             mDb.close();
-            Log.d(MainActivity.TAG, "Сохранение адресов в локальную БД завершено");
+            Log.d(MainActivity3.TAG, "Сохранение адресов в локальную БД завершено");
         }
     }
 
@@ -683,6 +697,95 @@ public class DBHelper extends SQLiteOpenHelper {
             if (closeDb)
                 mDb.close();
         }
+    }
+
+    public UserList getUserListFromDb() {
+
+        UserList result = new UserList(mContext);
+        Cursor c = null;
+        openDB();
+        try {
+            c = mDb.query(USER_TBL, null, null, null, null, null, null);
+
+            if (c != null) {
+                try {
+                    if (c.moveToFirst()) {
+                        String str;
+                        do {
+                            User user = new User();
+                            parseUserFromCursorRow(user, c);
+                            result.add(user);
+                        } while (c.moveToNext());
+                    }
+                }
+                finally {
+                    c.close();
+                }
+            }
+        }
+        finally {
+            mDb.close();
+        }
+        return result;
+    }
+
+    public User getLastSignInUserFromDb(){
+        User user = new User();
+        Cursor c = null;
+        openDB();
+        try {
+           c = mDb.query(USER_TBL,null,null,null,null,null,"last_login DESC","1");
+            if(c.moveToFirst()){
+                parseUserFromCursorRow(user, c);
+            }
+        }
+        finally {
+            mDb.close();
+        }
+        return user;
+    }
+
+    public User insertUserIntoDb(User user){
+        String email = user.getEmail();
+        if (user == null || user.isEmpty()){
+            throw new NullPointerException("Ошибка! Попытка создания пользователя в БД без Email");
+        }
+        openDB();
+        try{
+            mDb.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put("email", user.getEmail());
+            values.put("first_name",user.getFirstName());
+            values.put("last_name", user.getLastName());
+            values.put("token", user.getToken());
+            values.put("expire_token", Utils.getStringFromDateSQLITE(user.getExpireToken()));
+            values.put("avatar_img", user.getAvatarImg());
+
+            int result = (int) mDb.insertOrThrow(USER_TBL,null, values);
+            mDb.setTransactionSuccessful();
+            user.setId(result);
+        }
+        catch (Exception ex){
+            Log.e("ERROR", ex.getMessage());
+            throw ex;
+        }
+        finally {
+            mDb.endTransaction();
+            mDb.close();
+        }
+
+        return user;
+    }
+
+    private void parseUserFromCursorRow(User user, Cursor c) {
+        user.setId(c.getInt(c.getColumnIndex("_id")));
+        user.setEmail(c.getString(c.getColumnIndex("email")));
+        user.setFirstName(c.getString(c.getColumnIndex("first_name")));
+        user.setLastName(c.getString(c.getColumnIndex("last_name")));
+        user.setToken(c.getString(c.getColumnIndex("token")));
+        user.setExpireToken(Utils.ConvertToDateSQLITE(c.getString(c.getColumnIndex("expire_token"))));
+        user.setLastLogin(Utils.ConvertToDateSQLITE(c.getString(c.getColumnIndex("last_login"))));
+        user.setAvatarImg(c.getBlob(c.getColumnIndex("avatar_img")));
     }
 
     public void beginTransaction() {

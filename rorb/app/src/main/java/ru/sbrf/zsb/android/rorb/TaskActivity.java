@@ -41,11 +41,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -596,7 +594,7 @@ public class TaskActivity extends AppCompatActivity {
                 mClaime.saveToLocalDb();
 
             } catch (Exception e){
-                Log.d(MainActivity.TAG, e.getMessage());
+                Log.d(MainActivity3.TAG, e.getMessage());
                 result = "Ошибка при отправке заявки на сервер";
             }
             return result;

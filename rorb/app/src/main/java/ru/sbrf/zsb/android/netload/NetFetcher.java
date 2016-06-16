@@ -27,7 +27,7 @@ import ru.sbrf.zsb.android.rorb.Claime;
 import ru.sbrf.zsb.android.rorb.ClaimeStatus;
 import ru.sbrf.zsb.android.rorb.ClaimeStatusList;
 import ru.sbrf.zsb.android.rorb.DBHelper;
-import ru.sbrf.zsb.android.rorb.MainActivity;
+import ru.sbrf.zsb.android.rorb.MainActivity3;
 import ru.sbrf.zsb.android.rorb.Service;
 import ru.sbrf.zsb.android.rorb.ServiceList;
 
@@ -62,7 +62,7 @@ public class NetFetcher {
     public NetFetcher(Context context) {
         mContext = context;
         mUsername = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext())
-                .getString(MainActivity.USER_TOKEN, NetFetcher.UserToken);
+                .getString(MainActivity3.USER_TOKEN, NetFetcher.UserToken);
     }
 
     //Возвращает массив байт, принятых по сети
@@ -77,7 +77,7 @@ public class NetFetcher {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 InputStream in = new BufferedInputStream(connection.getInputStream());
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    Log.d(MainActivity.TAG, "Ошибка соединения: код " + connection.getResponseCode());
+                    Log.d(MainActivity3.TAG, "Ошибка соединения: код " + connection.getResponseCode());
                     return null;
                 }
                 int bytesRead = 0;
@@ -91,7 +91,7 @@ public class NetFetcher {
                 connection.disconnect();
             }
         } catch (Exception e) {
-            Log.d(MainActivity.TAG, e.getMessage());
+            Log.d(MainActivity3.TAG, e.getMessage());
             return null;
         }
     }
@@ -109,7 +109,7 @@ public class NetFetcher {
 
     //Читаем заявки из сети
     public ArrayList<Claime> fetchClaims() throws JSONException {
-        Log.d(MainActivity.TAG, "Считывание заявок по сети");
+        Log.d(MainActivity3.TAG, "Считывание заявок по сети");
         ArrayList<Claime> result = new ArrayList<>();
         try {
             String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
@@ -123,18 +123,18 @@ public class NetFetcher {
                     result.add(new Claime(arr.getJSONObject(i), mContext));
                 }
             }
-            Log.d(MainActivity.TAG, "Считывание заявок по сети завершено");
+            Log.d(MainActivity3.TAG, "Считывание заявок по сети завершено");
 
         } catch (IOException ioe) {
 
-            Log.e(MainActivity.TAG, "Ошибка при чтении заявок: " + ioe.getMessage(), ioe);
+            Log.e(MainActivity3.TAG, "Ошибка при чтении заявок: " + ioe.getMessage(), ioe);
         }
         return result;
     }
 
     //Читаем заявки из сети
     public Claime fetchPhotos(Claime claime) throws JSONException {
-        Log.d(MainActivity.TAG, "Считывание фоток по сети");
+        Log.d(MainActivity3.TAG, "Считывание фоток по сети");
         try {
             try {
                 String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
@@ -147,23 +147,23 @@ public class NetFetcher {
                     Claime cl = new Claime(obj, mContext);
                     claime.getPhotoList().clear();
                     claime.getPhotoList().addAll(cl.getPhotoList());
-                    Log.d(MainActivity.TAG, "Считывание фоток по сети завершено, считано: " + claime.getPhotoList().size());
+                    Log.d(MainActivity3.TAG, "Считывание фоток по сети завершено, считано: " + claime.getPhotoList().size());
                     claime.updatePhotosInLocal();
                 }
 
             } catch (IOException ioe) {
 
-                Log.e(MainActivity.TAG, "Ошибка при чтении фоток: " + ioe.getMessage(), ioe);
+                Log.e(MainActivity3.TAG, "Ошибка при чтении фоток: " + ioe.getMessage(), ioe);
             }
         } catch (Exception e) {
-            Log.e(MainActivity.TAG, "Ошибка при чтении фоток: " + e.getMessage(), e);
+            Log.e(MainActivity3.TAG, "Ошибка при чтении фоток: " + e.getMessage(), e);
         }
         return claime;
     }
 
     //Читаем адреса с сервера
     public AddressList fetchAddresses() throws JSONException, IOException {
-        Log.d(MainActivity.TAG, "Считывание адресов по сети");
+        Log.d(MainActivity3.TAG, "Считывание адресов по сети");
         AddressList result = new AddressList(mContext);
         Date lastUpdate = getLastDate(DBHelper.ADDRESS_TBL);
 
@@ -187,9 +187,9 @@ public class NetFetcher {
                     result.add(item);
                 }
             }
-            Log.d(MainActivity.TAG, "Считывание адресов по сети завершено");
+            Log.d(MainActivity3.TAG, "Считывание адресов по сети завершено");
         } catch (IOException ioe) {
-            Log.e(MainActivity.TAG, "Ошибка при чтении адресов: " + ioe.getMessage(), ioe);
+            Log.e(MainActivity3.TAG, "Ошибка при чтении адресов: " + ioe.getMessage(), ioe);
             throw ioe;
         }
         return result;
@@ -198,7 +198,7 @@ public class NetFetcher {
     ;
 
     public ClaimeStatusList fetchStatuses() throws JSONException {
-        Log.d(MainActivity.TAG, "Считывание статусов по сети");
+        Log.d(MainActivity3.TAG, "Считывание статусов по сети");
         ClaimeStatusList result = new ClaimeStatusList(mContext);
         Date lastUpdate = getLastDate(DBHelper.STATUS_TBL);
 
@@ -222,10 +222,10 @@ public class NetFetcher {
 
                 }
             }
-            Log.d(MainActivity.TAG, "Считывание статусов по сети завершено!");
+            Log.d(MainActivity3.TAG, "Считывание статусов по сети завершено!");
 
         } catch (IOException ioe) {
-            Log.e(MainActivity.TAG, "Ошибка при чтении статусов: " + ioe.getMessage(), ioe);
+            Log.e(MainActivity3.TAG, "Ошибка при чтении статусов: " + ioe.getMessage(), ioe);
         }
         return result;
     }
@@ -242,7 +242,7 @@ public class NetFetcher {
     }
 
     public ServiceList fetchServices() throws JSONException {
-        Log.d(MainActivity.TAG, "Считывание сервисов по сети");
+        Log.d(MainActivity3.TAG, "Считывание сервисов по сети");
         ServiceList result = new ServiceList(mContext);
         Date lastUpdate = getLastDate(DBHelper.SERVICE_TBL);
         try {
@@ -264,9 +264,9 @@ public class NetFetcher {
                     result.add(new Service(arr.getJSONObject(i)));
                 }
             }
-            Log.d(MainActivity.TAG, "Считывание сервисов по сети завершено");
+            Log.d(MainActivity3.TAG, "Считывание сервисов по сети завершено");
         } catch (IOException ioe) {
-            Log.e(MainActivity.TAG, "Ошибка при чтении статусов: " + ioe.getMessage(), ioe);
+            Log.e(MainActivity3.TAG, "Ошибка при чтении статусов: " + ioe.getMessage(), ioe);
         }
         return result;
     }
