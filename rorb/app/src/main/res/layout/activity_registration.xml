@@ -68,6 +68,8 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/TextButtonColor"
         android:text="@string/reg_btn_ok"
         />
 </LinearLayout>

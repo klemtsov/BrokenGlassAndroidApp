@@ -15,7 +15,7 @@ import ru.sbrf.zsb.android.helper.Utils;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 2;
     private static final String DB_NAME = "brglass_db";
     private static final String CLAIME_TBL = "claime";
     public static final String ADDRESS_TBL = "address";
@@ -123,6 +123,20 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop table claime");
         db.execSQL("drop table photo");
         */
+        Log.d(MainActivity3.TAG, " --- UPDATE DATABASE --- ");
+        db.execSQL("create table " + USER_TBL
+                + " (_id integer primary key autoincrement,"
+                + " email text NOT NULL,"
+                + " first_name text,"
+                + " last_name text,"
+                + " token text,"
+                + " expire_token datetime,"
+                + " last_login datetime,"
+                + " avatar_img blob,"
+                + " is_login integer default 0,"
+                + " CONSTRAINT cnstr_user_email UNIQUE (email)"
+                + ");"
+        );
     }
 
     public void openDB() {
