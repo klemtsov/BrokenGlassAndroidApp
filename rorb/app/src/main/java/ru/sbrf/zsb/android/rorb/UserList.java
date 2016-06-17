@@ -6,6 +6,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import ru.sbrf.zsb.android.exceptions.UserInsertDbException;
+
 /**
  * Created by munk1 on 16.06.2016.
  */
@@ -43,7 +45,11 @@ public class UserList extends RefObjectList<User> {
         return mDb.getLastSignInUserFromDb();
     }
 
-    public User insertUserDb(User user){
+    public User insertUserDb(User user) throws UserInsertDbException {
+        return mDb.insertUserIntoDb(user);
+    }
 
+    public void deleteAllUsers(){
+        mDb.deleteAllUsersFromDB();
     }
 }

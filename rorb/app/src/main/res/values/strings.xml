@@ -27,4 +27,8 @@
     <string name="page">page</string>
     <string name="claime_status_all_name">Все</string>
     <string name="claime_status_all_code">ALL</string>
+    <string name="reg_email_txt_placeholder">E-mail @sberbank.ru</string>
+    <string name="reg_password_txt_placeholder">Пароль</string>
+    <string name="reg_pass_confirm_txt_placeholder">Подтвеждение пароля</string>
+    <string name="reg_btn_ok">Зарегестрироваться</string>
 </resources>

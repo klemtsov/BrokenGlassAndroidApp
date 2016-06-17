@@ -39,6 +39,10 @@
             android:name=".FullScreenViewActivity"
             android:theme="@android:style/Theme.Holo.NoActionBar">
         </activity>
+        <activity
+            android:name=".RegistrationActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

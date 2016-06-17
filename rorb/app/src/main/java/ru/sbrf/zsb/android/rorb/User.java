@@ -14,6 +14,16 @@ public class User {
     private Date mExpireToken;
     private Date mLastLogin;
     private byte[] mAvatarImg;
+    private boolean mIsLogin;
+
+    public User() {
+    }
+
+    public User(String mEmail, String mFirstName, String mLastName) {
+        this.mEmail = mEmail;
+        this.mFirstName = mFirstName;
+        this.mLastName = mLastName;
+    }
 
     public int getId() {
         return mId;
@@ -81,5 +91,13 @@ public class User {
 
     public boolean isEmpty(){
         return this.mId == 0;
+    }
+
+    public boolean isLogin() {
+        return mIsLogin;
+    }
+
+    public void setIsLogin(boolean mIsLogin) {
+        this.mIsLogin = mIsLogin;
     }
 }

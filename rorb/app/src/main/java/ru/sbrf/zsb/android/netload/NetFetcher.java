@@ -13,13 +13,17 @@ import org.json.JSONTokener;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ru.sbrf.zsb.android.exceptions.UserRegistrationException;
 import ru.sbrf.zsb.android.helper.Utils;
 import ru.sbrf.zsb.android.rorb.Address;
 import ru.sbrf.zsb.android.rorb.AddressList;
@@ -30,13 +34,14 @@ import ru.sbrf.zsb.android.rorb.DBHelper;
 import ru.sbrf.zsb.android.rorb.MainActivity3;
 import ru.sbrf.zsb.android.rorb.Service;
 import ru.sbrf.zsb.android.rorb.ServiceList;
+import ru.sbrf.zsb.android.rorb.UserRegistrationModel;
 
 /**
  * Created by Администратор on 27.05.2016.
  */
 public class NetFetcher {
-    //public static final String ENDPOINT = "http://192.168.1.245:8050/api/";
-    public static final String ENDPOINT = "http://muzychenkoaa-001-site2.ftempurl.com/api/";
+    public static final String ENDPOINT = "http://192.168.1.245:8050/api/";
+    //public static final String ENDPOINT = "http://muzychenkoaa-001-site2.ftempurl.com/api/";
     public static final String SERVICES = "Services";
     public static final String SERVICE_STATUS = "ClaimStates";
     public static final String ADDRESSES = "Adresses";
@@ -45,6 +50,11 @@ public class NetFetcher {
     public static final String USER_TOKEN_PARAM = "userEmail";
     public static final String UserToken = "zsbdeveloper@gmail.com";
     private static final String LAST_UPDATE_PARAM = "lastUpdateDate";
+    private static final String REGISTRATION = "Registration";
+    private static final String REGISTRATION_PARAM_EMAIL = "Email";
+    private static final String REGISTRATION_PARAM_PASSWORD = "Password";
+    private static final String REGISTRATION_PARAM_CONFIRM_PASS = "ConfirmPassword";
+
     private Context mContext;
     private String mUsername;
 
@@ -269,6 +279,41 @@ public class NetFetcher {
             Log.e(MainActivity3.TAG, "Ошибка при чтении статусов: " + ioe.getMessage(), ioe);
         }
         return result;
+    }
+
+    public void userRegistration(UserRegistrationModel user) throws UserRegistrationException {
+
+        try{
+            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                    .appendPath(NetFetcher.REGISTRATION)
+                    .build().toString();
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setDoInput(true);
+            connection.setConnectTimeout(30000);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type","application/json");
+            connection.connect();
+
+            JSONObject outObj = new JSONObject();
+            outObj.put(NetFetcher.REGISTRATION_PARAM_EMAIL, user.getEmail());
+            outObj.put(NetFetcher.REGISTRATION_PARAM_PASSWORD, user.getPassword());
+            outObj.put(NetFetcher.REGISTRATION_PARAM_CONFIRM_PASS, user.getConfirmPassword());
+
+            try(DataOutputStream dataOut = new DataOutputStream(connection.getOutputStream())){
+                dataOut.writeUTF(outObj.toString());
+                dataOut.flush();
+            }
+            connection.getInputStream();
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_CREATED){
+                throw new Exception("Регистрация не выполнена. На сервере произошила ошибка!");
+            }
+        }
+        catch (Exception ex){
+            Log.e("ERROR",ex.getMessage());
+            throw new UserRegistrationException();
+        }
+
     }
 
 }

@@ -10,11 +10,12 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ru.sbrf.zsb.android.exceptions.UserInsertDbException;
 import ru.sbrf.zsb.android.helper.Utils;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String DB_NAME = "brglass_db";
     private static final String CLAIME_TBL = "claime";
     public static final String ADDRESS_TBL = "address";
@@ -108,6 +109,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " expire_token datetime,"
                 + " last_login datetime,"
                 + " avatar_img blob,"
+                + " is_login integer default 0,"
                 + " CONSTRAINT cnstr_user_email UNIQUE (email)"
                 + ");"
         );
@@ -745,7 +747,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return user;
     }
 
-    public User insertUserIntoDb(User user){
+    public User insertUserIntoDb(User user) throws UserInsertDbException{
         String email = user.getEmail();
         if (user == null || user.isEmpty()){
             throw new NullPointerException("Ошибка! Попытка создания пользователя в БД без Email");
@@ -767,15 +769,27 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         catch (Exception ex){
             Log.e("ERROR", ex.getMessage());
-            throw ex;
+            throw new UserInsertDbException();
         }
         finally {
             mDb.endTransaction();
             mDb.close();
         }
-
         return user;
     }
+
+    public void deleteAllUsersFromDB(){
+        openDB();
+        try {
+            mDb.beginTransaction();
+            mDb.execSQL("DELETE FROM " + USER_TBL);
+            mDb.setTransactionSuccessful();
+        }
+        finally {
+            mDb.endTransaction();
+        }
+    }
+
 
     private void parseUserFromCursorRow(User user, Cursor c) {
         user.setId(c.getInt(c.getColumnIndex("_id")));
@@ -786,6 +800,7 @@ public class DBHelper extends SQLiteOpenHelper {
         user.setExpireToken(Utils.ConvertToDateSQLITE(c.getString(c.getColumnIndex("expire_token"))));
         user.setLastLogin(Utils.ConvertToDateSQLITE(c.getString(c.getColumnIndex("last_login"))));
         user.setAvatarImg(c.getBlob(c.getColumnIndex("avatar_img")));
+        user.setIsLogin( c.getInt(c.getColumnIndex("is_login")) == 1);
     }
 
     public void beginTransaction() {
