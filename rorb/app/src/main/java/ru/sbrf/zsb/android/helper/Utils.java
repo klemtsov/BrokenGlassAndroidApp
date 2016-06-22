@@ -19,6 +19,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Администратор on 27.05.2016.
@@ -26,6 +28,12 @@ import java.util.TimeZone;
 public class Utils {
     public static final String DB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SS";
     public static final String SQLITE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    public static boolean regExMatches(String value, String regularExpression){
+        Pattern pattern = Pattern.compile(regularExpression);
+        Matcher matcher = pattern.matcher(value);
+        return matcher.matches();
+    }
 
     public static String fromJsonString(JSONObject json, String tag) {
         String res = json.optString(tag);

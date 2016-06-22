@@ -123,7 +123,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop table claime");
         db.execSQL("drop table photo");
         */
-/*        Log.d(MainActivity3.TAG, " --- UPDATE DATABASE --- ");
+/*      Log.d(MainActivity3.TAG, " --- UPDATE DATABASE --- ");
         db.execSQL("create table " + USER_TBL
                 + " (_id integer primary key autoincrement,"
                 + " email text NOT NULL,"
