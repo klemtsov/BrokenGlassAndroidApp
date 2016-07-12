@@ -12,14 +12,15 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -40,8 +41,9 @@ import ru.sbrf.zsb.android.rorb.UserRegistrationModel;
  * Created by Администратор on 27.05.2016.
  */
 public class NetFetcher {
-    public static final String ENDPOINT = "http://192.168.1.245:8050/api/";
-    //public static final String ENDPOINT = "http://muzychenkoaa-001-site2.ftempurl.com/api/";
+    public static final String ENDPOINT_API = "http://192.168.1.245:8050/api/";
+    public static final String ENDPOINT_SERVER = "http://192.168.1.245:8050/";
+    //public static final String ENDPOINT_API = "http://muzychenkoaa-001-site2.ftempurl.com/api/";
     public static final String SERVICES = "Services";
     public static final String SERVICE_STATUS = "ClaimStates";
     public static final String ADDRESSES = "Adresses";
@@ -122,7 +124,7 @@ public class NetFetcher {
         Log.d(MainActivity3.TAG, "Считывание заявок по сети");
         ArrayList<Claime> result = new ArrayList<>();
         try {
-            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+            String url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                     .appendPath(NetFetcher.CLAIMS)
                     .appendQueryParameter(NetFetcher.USER_TOKEN_PARAM, mUsername)
                     .build().toString();
@@ -147,7 +149,7 @@ public class NetFetcher {
         Log.d(MainActivity3.TAG, "Считывание фоток по сети");
         try {
             try {
-                String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                String url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                         .appendPath(NetFetcher.CLAIMS)
                         .appendPath(claime.getId())
                         .build().toString();
@@ -178,12 +180,12 @@ public class NetFetcher {
         Date lastUpdate = getLastDate(DBHelper.ADDRESS_TBL);
 
         try {
-            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+            String url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                     .appendPath(NetFetcher.ADDRESSES)
                     .build().toString();
 
             if (lastUpdate != null) {
-                url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                         .appendPath(NetFetcher.ADDRESSES)
                         .appendQueryParameter(NetFetcher.LAST_UPDATE_PARAM, Utils.getStringFromDateTime(lastUpdate))
                         .build().toString();
@@ -213,12 +215,12 @@ public class NetFetcher {
         Date lastUpdate = getLastDate(DBHelper.STATUS_TBL);
 
         try {
-            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+            String url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                     .appendPath(NetFetcher.SERVICE_STATUS)
                     .build().toString();
 
             if (lastUpdate != null) {
-                url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                         .appendPath(NetFetcher.SERVICE_STATUS)
                         .appendQueryParameter(NetFetcher.LAST_UPDATE_PARAM, Utils.getStringFromDateTime(lastUpdate))
                         .build().toString();
@@ -256,12 +258,12 @@ public class NetFetcher {
         ServiceList result = new ServiceList(mContext);
         Date lastUpdate = getLastDate(DBHelper.SERVICE_TBL);
         try {
-            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+            String url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                     .appendPath(NetFetcher.SERVICES)
                     .build().toString();
 
             if (lastUpdate != null) {
-                url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                url = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                         .appendPath(NetFetcher.SERVICES)
                         .appendQueryParameter(NetFetcher.LAST_UPDATE_PARAM, Utils.getStringFromDateTime(lastUpdate))
                         .build().toString();
@@ -282,28 +284,37 @@ public class NetFetcher {
     }
 
     public void userRegistration(UserRegistrationModel user) throws UserRegistrationException {
-
+        HttpURLConnection connection = null;
         try{
-            String url = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+            String url = Uri.parse(NetFetcher.ENDPOINT_SERVER).buildUpon()
                     .appendPath(NetFetcher.REGISTRATION)
                     .build().toString();
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setDoInput(true);
+            connection = (HttpURLConnection) (new URL(url).openConnection());
+            connection.setDoOutput(true);
             connection.setConnectTimeout(30000);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type","application/json");
+            connection.setRequestProperty("Accept", "application/json");
             connection.connect();
 
             JSONObject outObj = new JSONObject();
             outObj.put(NetFetcher.REGISTRATION_PARAM_EMAIL, user.getEmail());
             outObj.put(NetFetcher.REGISTRATION_PARAM_PASSWORD, user.getPassword());
             outObj.put(NetFetcher.REGISTRATION_PARAM_CONFIRM_PASS, user.getConfirmPassword());
+            String testJson = outObj.toString();
 
-            try(DataOutputStream dataOut = new DataOutputStream(connection.getOutputStream())){
-                dataOut.writeUTF(outObj.toString());
-                dataOut.flush();
+            OutputStream outputStream = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            try{
+                writer.write(outObj.toString());
             }
-            connection.getInputStream();
+            finally {
+                writer.close();
+                outputStream.close();
+            }
+
+
+            //connection.getInputStream();
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_CREATED){
                 throw new Exception("Регистрация не выполнена. На сервере произошила ошибка!");
@@ -312,6 +323,11 @@ public class NetFetcher {
         catch (Exception ex){
             Log.e("ERROR",ex.getMessage());
             throw new UserRegistrationException();
+        }
+        finally {
+            if (connection != null){
+                connection.disconnect();
+            }
         }
 
     }

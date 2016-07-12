@@ -524,7 +524,7 @@ public class TaskActivity extends AppCompatActivity {
                 JSONObject innerJson = new JSONObject();
                 innerJson.put("Email", NetFetcher.UserToken);
                 json.put("User", innerJson);
-                String uri = Uri.parse(NetFetcher.ENDPOINT).buildUpon()
+                String uri = Uri.parse(NetFetcher.ENDPOINT_API).buildUpon()
                         .appendPath(NetFetcher.CLAIMS)
                         .build().toString();
 

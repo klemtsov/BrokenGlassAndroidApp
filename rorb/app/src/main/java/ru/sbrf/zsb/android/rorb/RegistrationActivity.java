@@ -1,6 +1,8 @@
 package ru.sbrf.zsb.android.rorb;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -12,13 +14,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
+import ru.sbrf.zsb.android.exceptions.UserInsertDbException;
+import ru.sbrf.zsb.android.exceptions.UserRegistrationException;
 import ru.sbrf.zsb.android.helper.Utils;
 
 /**
  * Created by Администратор on 17.06.2016.
  */
-public class RegistrationActivity extends Activity {
+public class RegistrationActivity extends Activity implements AsyncHandleResult  {
 
     public final static String REG_EXP_SBERBANK_EMAIL = "^\\w+([+-.']\\w+)*@sberbank\\.ru";
     public final static String REG_EXP_PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d\\S]{8,}$";
@@ -42,7 +47,12 @@ public class RegistrationActivity extends Activity {
             public void onClick(View v) {
                 InitInputValue();
                 if(isValidRegistrationData()){
-                    Toast.makeText(RegistrationActivity.this,"Registration is Succesed!",Toast.LENGTH_LONG).show();
+                    Boolean result = false;
+                    UserRegistrationModel userData = new UserRegistrationModel();
+                    userData.setEmail(email);
+                    userData.setPassword(password);
+                    userData.setConfirmPassword(password);
+                    AsyncTask<UserRegistrationModel, Void, Void> task =  new RegistrationTask().execute(userData);
                 }
             }
         });
@@ -91,10 +101,54 @@ public class RegistrationActivity extends Activity {
         return !result;
     }
 
+
+
     private boolean isValidRegExEmail(){
         return Utils.regExMatches(email, REG_EXP_SBERBANK_EMAIL);
     }
     private boolean isValidRegExPassword(){
         return Utils.regExMatches(password, REG_EXP_PASSWORD);
+    }
+
+    @Override
+    public void onReciveResponseHandler(Object value) {
+            if ((Boolean) value) {
+                Intent intent = new Intent(RegistrationActivity.this, InfoPopupActivity.class);
+                intent.putExtra("TEXT_INFO_MESSAGE", "Регистрация прошла успешно! " +
+                        "На указанный Email было направлено письмо для подверждение вашего Email. " +
+                        "Перед началом работы с приложением вам необходимо подтвердить Email.");
+                startActivity(intent);
+            }
+
+    }
+
+    public class RegistrationTask extends AsyncTask<UserRegistrationModel, Void, Void> {
+        String textToast = null;
+        Boolean result = null;
+        AsyncHandleResult delegateResult = null;
+        @Override
+        protected Void doInBackground(UserRegistrationModel... params) {
+            UserContext userContext = UserContext.getCurrentUserContext(RegistrationActivity.this);
+            textToast = null;
+            result = null;
+                try {
+                    userContext.RegistrationUser(params[0]);
+                    result = true;
+                }
+                catch (Exception e){
+                    textToast = "Ошибка регистрации! На сервере возникли проблемы!";
+                }
+            result = false;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(textToast != null){
+                Toast.makeText(RegistrationActivity.this, textToast, Toast.LENGTH_LONG).show();
+            }
+            delegateResult.onReciveResponseHandler(result);
+        }
     }
 }
